@@ -1,0 +1,45 @@
+version: "3.2"
+
+services:
+  adminer:
+    image: adminer
+    restart: always
+    networks:
+      - db_network
+    ports:
+      - 7000:8080
+
+  frontend:
+    build: ./frontend
+    restart: always
+    networks:
+      - api_network
+    ports:
+      - 80:80
+
+  backend:
+    build: ./backend
+    restart: always
+    networks:
+      - api_network
+      - db_network
+    ports:
+      - 3000:3000
+    depends_on:
+      - postgres
+
+  postgres:
+    image: 'postgres:latest'
+    networks:
+      - db_network
+    env_file:
+      - ./backend/.env
+    volumes:
+      - data:/var/lib/postgresql/data
+
+networks:
+  db_network:
+  api_network:
+
+volumes:
+  data:
